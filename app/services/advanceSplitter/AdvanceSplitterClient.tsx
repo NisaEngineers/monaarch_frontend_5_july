@@ -19,18 +19,20 @@ export default function AdvancedSplitterClient() {
     stringsOrPads: "",
     bass: "",
     drums: "",
-    piano: ""
+    piano: "",
+    guitar: ""
   });
   const [error, setError] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
-  // Refs and states for audio elements
+  // Refs for audio elements
   const originalAudioRef = useRef<HTMLAudioElement>(null);
   const vocalsAudioRef = useRef<HTMLAudioElement>(null);
   const stringsOrPadsAudioRef = useRef<HTMLAudioElement>(null);
   const bassAudioRef = useRef<HTMLAudioElement>(null);
   const drumsAudioRef = useRef<HTMLAudioElement>(null);
   const pianoAudioRef = useRef<HTMLAudioElement>(null);
+  const guitarAudioRef = useRef<HTMLAudioElement>(null);
 
   // Volume states
   const [originalVolume, setOriginalVolume] = useState(0);
@@ -39,6 +41,7 @@ export default function AdvancedSplitterClient() {
   const [bassVolume, setBassVolume] = useState(0);
   const [drumsVolume, setDrumsVolume] = useState(0);
   const [pianoVolume, setPianoVolume] = useState(0);
+  const [guitarVolume, setGuitarVolume] = useState(0);
 
   // Play states
   const [isPlayingOriginal, setIsPlayingOriginal] = useState(false);
@@ -47,6 +50,7 @@ export default function AdvancedSplitterClient() {
   const [isPlayingBass, setIsPlayingBass] = useState(false);
   const [isPlayingDrums, setIsPlayingDrums] = useState(false);
   const [isPlayingPiano, setIsPlayingPiano] = useState(false);
+  const [isPlayingGuitar, setIsPlayingGuitar] = useState(false);
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files?.[0]) {
@@ -60,45 +64,40 @@ export default function AdvancedSplitterClient() {
 
   const handleProcess = async () => {
     if (!uploadedFile) return;
-    
+
     setProcessing(true);
     setError(null);
 
     try {
       const formData = new FormData();
-      formData.append("audio_file", uploadedFile);
-      formData.append("task", "Advanced Split");
+      formData.append("file", uploadedFile);
 
-      const response = await fetch("http://localhost:8001/process-audio/", {
+      const response = await fetch("http://localhost:8001/api/separate", {
         method: "POST",
         body: formData,
       });
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.detail || "Processing failed");
       }
 
-      if (data.output_files?.length >= 5) {
-        const processPath = (rawPath: string) => 
-          rawPath.replace(/\\/g, '/')
-                 .split('/')
-                 .map(segment => encodeURIComponent(segment))
-                 .join('/');
-
+      if (data.status === "success" && data.download_links) {
+        const baseUrl = "http://localhost:8001";
         const tracks = {
-          vocals: `http://localhost:8001/download/${processPath(data.output_files[0])}`,
-          stringsOrPads: `http://localhost:8001/download/${processPath(data.output_files[1])}`,
-          bass: `http://localhost:8001/download/${processPath(data.output_files[2])}`,
-          drums: `http://localhost:8001/download/${processPath(data.output_files[3])}`,
-          piano: `http://localhost:8001/download/${processPath(data.output_files[4])}`
+          vocals: `${baseUrl}${data.download_links["vocals.wav"]}`,
+          stringsOrPads: `${baseUrl}${data.download_links["strings_or_pads.wav"]}`,
+          bass: `${baseUrl}${data.download_links["bass.wav"]}`,
+          drums: `${baseUrl}${data.download_links["drums.wav"]}`,
+          piano: `${baseUrl}${data.download_links["piano.wav"]}`,
+          guitar: `${baseUrl}${data.download_links["guitar.wav"]}`
         };
 
-        // Verify all tracks
+        // Verify all tracks are accessible
         const responses = await Promise.all(Object.values(tracks).map(url => fetch(url)));
-        if (responses.some(r => !r.ok)) throw new Error("Some tracks missing");
-        
+        if (responses.some(r => !r.ok)) throw new Error("Some tracks are missing");
+
         setSplitTracks(tracks);
       } else {
         throw new Error("Invalid server response");
@@ -120,7 +119,7 @@ export default function AdvancedSplitterClient() {
     setVolume: React.Dispatch<React.SetStateAction<number>>
   ) => {
     if (!ref.current) return;
-    
+
     if (isPlaying) {
       ref.current.pause();
     } else {
@@ -138,7 +137,7 @@ export default function AdvancedSplitterClient() {
   ) => {
     setVolume(value);
     if (!ref.current) return;
-    
+
     ref.current.volume = value / 100;
     if (value === 0) {
       ref.current.pause();
@@ -159,7 +158,8 @@ export default function AdvancedSplitterClient() {
     syncVolume(bassAudioRef, bassVolume);
     syncVolume(drumsAudioRef, drumsVolume);
     syncVolume(pianoAudioRef, pianoVolume);
-  }, [originalVolume, vocalsVolume, stringsOrPadsVolume, bassVolume, drumsVolume, pianoVolume]);
+    syncVolume(guitarAudioRef, guitarVolume);
+  }, [originalVolume, vocalsVolume, stringsOrPadsVolume, bassVolume, drumsVolume, pianoVolume, guitarVolume]);
 
   return (
     <section className="relative min-h-screen overflow-hidden">
@@ -180,7 +180,7 @@ export default function AdvancedSplitterClient() {
                 Advanced Splitter
               </h1>
               <p className="text-lg mt-4 text-gray-300 max-w-3xl mx-auto">
-                Splits audio into Vocals, Strings/Pads, Bass, Drums, and Piano
+                Splits audio into Vocals, Strings/Pads, Bass, Drums, Piano, and Guitar
               </p>
               {error && (
                 <div className="mt-4 p-3 bg-red-800/50 rounded-lg text-red-300">
@@ -286,8 +286,8 @@ export default function AdvancedSplitterClient() {
                 {/* Split Tracks Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {[
-                    { name: "Vocals", ref: vocalsAudioRef, volume: vocalsVolume, 
-                      setVolume: setVocalsVolume, isPlaying: isPlayingVocals, 
+                    { name: "Vocals", ref: vocalsAudioRef, volume: vocalsVolume,
+                      setVolume: setVocalsVolume, isPlaying: isPlayingVocals,
                       setIsPlaying: setIsPlayingVocals, url: splitTracks.vocals,
                       color: "bg-purple-600 hover:bg-purple-700" },
                     { name: "Strings/Pads", ref: stringsOrPadsAudioRef, volume: stringsOrPadsVolume,
@@ -306,6 +306,10 @@ export default function AdvancedSplitterClient() {
                       setVolume: setPianoVolume, isPlaying: isPlayingPiano,
                       setIsPlaying: setIsPlayingPiano, url: splitTracks.piano,
                       color: "bg-indigo-600 hover:bg-indigo-700" },
+                    { name: "Guitar", ref: guitarAudioRef, volume: guitarVolume,
+                      setVolume: setGuitarVolume, isPlaying: isPlayingGuitar,
+                      setIsPlaying: setIsPlayingGuitar, url: splitTracks.guitar,
+                      color: "bg-green-600 hover:bg-green-700" },
                   ].map((track) => (
                     <div key={track.name} className="p-6 rounded-lg border-2 border-dashed border-gray-500 bg-transparent">
                       <h2 className="text-xl font-semibold mb-4 text-center">{track.name}</h2>

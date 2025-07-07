@@ -21,9 +21,9 @@ export default function VocalRemoverClient() {
   const [error, setError] = useState<string | null>(null);
 
   // Refs for audio elements
-  const originalAudioRef = useRef<HTMLAudioElement>(null);
-  const vocalAudioRef = useRef<HTMLAudioElement>(null);
-  const instrumentalAudioRef = useRef<HTMLAudioElement>(null);
+  const originalAudioRef = useRef<HTMLAudioElement | null>(null);
+  const vocalAudioRef = useRef<HTMLAudioElement | null>(null);
+  const instrumentalAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {

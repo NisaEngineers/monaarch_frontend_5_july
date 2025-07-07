@@ -59,16 +59,18 @@ export default function VocalRemoverClient() {
       }
 
       if (data.output_files?.length >= 2) {
+        // Fixed: Added type annotation to segment parameter
         const vocalPath = data.output_files[0]
           .replace(/\\/g, '/')
           .split('/')
-          .map(segment => encodeURIComponent(segment))
+          .map((segment: string) => encodeURIComponent(segment)) // Added :string type
           .join('/');
 
+        // Fixed: Added type annotation to segment parameter
         const accompanimentPath = data.output_files[1]
           .replace(/\\/g, '/')
           .split('/')
-          .map(segment => encodeURIComponent(segment))
+          .map((segment: string) => encodeURIComponent(segment)) // Added :string type
           .join('/');
 
         const vocalURL = `http://localhost:8000/download/${vocalPath}`;

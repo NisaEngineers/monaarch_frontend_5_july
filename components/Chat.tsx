@@ -3,10 +3,16 @@
 import { useState } from "react";
 import { FaComments, FaPaperPlane } from "react-icons/fa";
 
+// Define the message type
+type Message = {
+  text: string;
+  sender: "user" | "bot";
+};
+
 export default function Chat() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const handleSendMessage = async () => {
     if (message.trim()) {

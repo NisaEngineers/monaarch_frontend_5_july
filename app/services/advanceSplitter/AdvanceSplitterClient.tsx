@@ -111,41 +111,46 @@ export default function AdvancedSplitterClient() {
   };
 
   // Audio control functions
-  const togglePlayPause = (
-    ref: React.RefObject<HTMLAudioElement>,
-    isPlaying: boolean,
-    setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>,
-    volume: number,
-    setVolume: React.Dispatch<React.SetStateAction<number>>
-  ) => {
-    if (!ref.current) return;
+  // Update the togglePlayPause function to accept nullable refs
+// Update the togglePlayPause function to accept nullable refs
+const togglePlayPause = (
+  ref: React.RefObject<HTMLAudioElement | null>, // Allow null
+  isPlaying: boolean,
+  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>,
+  volume: number,
+  setVolume: React.Dispatch<React.SetStateAction<number>>
+) => {
+  if (!ref.current) return;
 
-    if (isPlaying) {
-      ref.current.pause();
-    } else {
-      if (volume === 0) setVolume(50);
-      ref.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
+  if (isPlaying) {
+    ref.current.pause();
+  } else {
+    if (volume === 0) setVolume(50);
+    ref.current.play();
+  }
+  setIsPlaying(!isPlaying);
+};
 
-  const handleVolumeChange = (
-    ref: React.RefObject<HTMLAudioElement>,
-    value: number,
-    setVolume: React.Dispatch<React.SetStateAction<number>>,
-    setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>
-  ) => {
-    setVolume(value);
-    if (!ref.current) return;
+// Similarly update handleVolumeChange to accept nullable refs
+const handleVolumeChange = (
+  ref: React.RefObject<HTMLAudioElement | null>, // Allow null
+  value: number,
+  setVolume: React.Dispatch<React.SetStateAction<number>>,
+  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>
+) => {
+  setVolume(value);
+  if (!ref.current) return;
 
-    ref.current.volume = value / 100;
-    if (value === 0) {
-      ref.current.pause();
-      setIsPlaying(false);
-    } else if (!ref.current.paused) {
-      setIsPlaying(true);
-    }
-  };
+  ref.current.volume = value / 100;
+  if (value === 0) {
+    ref.current.pause();
+    setIsPlaying(false);
+  } else if (!ref.current.paused) {
+    setIsPlaying(true);
+  }
+};
+
+
 
 useEffect(() => {
   // Replace syncVolume function with direct checks

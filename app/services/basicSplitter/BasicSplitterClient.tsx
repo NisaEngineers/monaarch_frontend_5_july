@@ -106,9 +106,9 @@ export default function BasicSplitterClient() {
     }
   };
 
-  // Audio control functions
+  // Fixed: Update functions to accept nullable refs
   const togglePlayPause = (
-    ref: React.RefObject<HTMLAudioElement>,
+    ref: React.RefObject<HTMLAudioElement | null>, // Allow null
     isPlaying: boolean,
     setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>,
     volume: number,
@@ -125,8 +125,9 @@ export default function BasicSplitterClient() {
     setIsPlaying(!isPlaying);
   };
 
+  // Fixed: Update functions to accept nullable refs
   const handleVolumeChange = (
-    ref: React.RefObject<HTMLAudioElement>,
+    ref: React.RefObject<HTMLAudioElement | null>, // Allow null
     value: number,
     setVolume: React.Dispatch<React.SetStateAction<number>>,
     setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>
@@ -143,16 +144,13 @@ export default function BasicSplitterClient() {
     }
   };
 
+  // Fixed: Replace helper function with direct checks
   useEffect(() => {
-    const syncVolume = (ref: React.RefObject<HTMLAudioElement>, volume: number) => {
-      if (ref.current) ref.current.volume = volume / 100;
-    };
-
-    syncVolume(originalAudioRef, originalVolume);
-    syncVolume(vocalsAudioRef, vocalsVolume);
-    syncVolume(musicAudioRef, musicVolume);
-    syncVolume(bassAudioRef, bassVolume);
-    syncVolume(drumsAudioRef, drumsVolume);
+    if (originalAudioRef.current) originalAudioRef.current.volume = originalVolume / 100;
+    if (vocalsAudioRef.current) vocalsAudioRef.current.volume = vocalsVolume / 100;
+    if (musicAudioRef.current) musicAudioRef.current.volume = musicVolume / 100;
+    if (bassAudioRef.current) bassAudioRef.current.volume = bassVolume / 100;
+    if (drumsAudioRef.current) drumsAudioRef.current.volume = drumsVolume / 100;
   }, [originalVolume, vocalsVolume, musicVolume, bassVolume, drumsVolume]);
 
   
@@ -253,7 +251,7 @@ export default function BasicSplitterClient() {
                             <path d="M6 4h4v16h-4v-16zm8 0h4v16h-4v-16z" />
                           </svg>
                         ) : (
-                          <svg className="hFACT 12 w-12 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                          <svg className="h-12 w-12 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M5 3.5v17l14-8.5-14-8.5z" />
                           </svg>
                         )}

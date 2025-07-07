@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -16,9 +15,9 @@ export default function MixingMasterClient() {
   const [processing, setProcessing] = useState(false);
   const [originalAudioURL, setOriginalAudioURL] = useState<string | null>(null);
   const [masteredAudioURL, setMasteredAudioURL] = useState<string | null>(null);
-  const [highCutoff, setHighCutoff] = useState(1920); // Updated to match example
-  const [lowCutoff, setLowCutoff] = useState(190);   // Updated to match example
-  const [decibelLevel, setDecibelLevel] = useState(-27); // Updated to match example
+  const [highCutoff, setHighCutoff] = useState(1920);
+  const [lowCutoff, setLowCutoff] = useState(190);
+  const [decibelLevel, setDecibelLevel] = useState(-27);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -74,8 +73,9 @@ export default function MixingMasterClient() {
     }
   };
 
+  // Fixed: Update to accept nullable refs
   const togglePlayPause = (
-    ref: React.RefObject<HTMLAudioElement>,
+    ref: React.RefObject<HTMLAudioElement | null>,
     isPlaying: boolean,
     setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>,
     volume: number,
@@ -92,8 +92,9 @@ export default function MixingMasterClient() {
     setIsPlaying(!isPlaying);
   };
 
+  // Fixed: Update to accept nullable refs
   const handleVolumeChange = (
-    ref: React.RefObject<HTMLAudioElement>,
+    ref: React.RefObject<HTMLAudioElement | null>,
     value: number,
     setVolume: React.Dispatch<React.SetStateAction<number>>,
     setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>
@@ -110,13 +111,10 @@ export default function MixingMasterClient() {
     }
   };
 
+  // Fixed: Replace helper function with direct checks
   useEffect(() => {
-    const syncVolume = (ref: React.RefObject<HTMLAudioElement>, volume: number) => {
-      if (ref.current) ref.current.volume = volume / 100;
-    };
-
-    syncVolume(originalAudioRef, originalVolume);
-    syncVolume(masteredAudioRef, masteredVolume);
+    if (originalAudioRef.current) originalAudioRef.current.volume = originalVolume / 100;
+    if (masteredAudioRef.current) masteredAudioRef.current.volume = masteredVolume / 100;
   }, [originalVolume, masteredVolume]);
 
   return (

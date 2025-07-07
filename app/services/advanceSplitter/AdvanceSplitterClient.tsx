@@ -147,19 +147,16 @@ export default function AdvancedSplitterClient() {
     }
   };
 
-  useEffect(() => {
-    const syncVolume = (ref: React.RefObject<HTMLAudioElement>, volume: number) => {
-      if (ref.current) ref.current.volume = volume / 100;
-    };
-
-    syncVolume(originalAudioRef, originalVolume);
-    syncVolume(vocalsAudioRef, vocalsVolume);
-    syncVolume(stringsOrPadsAudioRef, stringsOrPadsVolume);
-    syncVolume(bassAudioRef, bassVolume);
-    syncVolume(drumsAudioRef, drumsVolume);
-    syncVolume(pianoAudioRef, pianoVolume);
-    syncVolume(guitarAudioRef, guitarVolume);
-  }, [originalVolume, vocalsVolume, stringsOrPadsVolume, bassVolume, drumsVolume, pianoVolume, guitarVolume]);
+useEffect(() => {
+  // Replace syncVolume function with direct checks
+  if (originalAudioRef.current) originalAudioRef.current.volume = originalVolume / 100;
+  if (vocalsAudioRef.current) vocalsAudioRef.current.volume = vocalsVolume / 100;
+  if (stringsOrPadsAudioRef.current) stringsOrPadsAudioRef.current.volume = stringsOrPadsVolume / 100;
+  if (bassAudioRef.current) bassAudioRef.current.volume = bassVolume / 100;
+  if (drumsAudioRef.current) drumsAudioRef.current.volume = drumsVolume / 100;
+  if (pianoAudioRef.current) pianoAudioRef.current.volume = pianoVolume / 100;
+  if (guitarAudioRef.current) guitarAudioRef.current.volume = guitarVolume / 100;
+}, [originalVolume, vocalsVolume, stringsOrPadsVolume, bassVolume, drumsVolume, pianoVolume, guitarVolume]);
 
   return (
     <section className="relative min-h-screen overflow-hidden">

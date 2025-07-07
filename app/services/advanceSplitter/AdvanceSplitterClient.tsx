@@ -148,24 +148,18 @@ export default function AdvancedSplitterClient() {
   };
 
   useEffect(() => {
-    // ... existing code ...
+    const syncVolume = (ref: React.RefObject<HTMLAudioElement>, volume: number) => {
+      if (ref.current) ref.current.volume = volume / 100;
+    };
 
-// Volume synchronization function
-const syncVolume = (ref: { current: HTMLAudioElement | null }, volume: number) => {
-  if (ref.current) ref.current.volume = volume / 100;
-};
-
-useEffect(() => {
-  syncVolume(originalAudioRef, originalVolume);
-  syncVolume(vocalsAudioRef, vocalsVolume);
-  syncVolume(stringsOrPadsAudioRef, stringsOrPadsVolume);
-  syncVolume(bassAudioRef, bassVolume);
-  syncVolume(drumsAudioRef, drumsVolume);
-  syncVolume(pianoAudioRef, pianoVolume);
-  syncVolume(guitarAudioRef, guitarVolume);
-}, [originalVolume, vocalsVolume, stringsOrPadsVolume, bassVolume, drumsVolume, pianoVolume, guitarVolume]);
-
-
+    syncVolume(originalAudioRef, originalVolume);
+    syncVolume(vocalsAudioRef, vocalsVolume);
+    syncVolume(stringsOrPadsAudioRef, stringsOrPadsVolume);
+    syncVolume(bassAudioRef, bassVolume);
+    syncVolume(drumsAudioRef, drumsVolume);
+    syncVolume(pianoAudioRef, pianoVolume);
+    syncVolume(guitarAudioRef, guitarVolume);
+  }, [originalVolume, vocalsVolume, stringsOrPadsVolume, bassVolume, drumsVolume, pianoVolume, guitarVolume]);
 
   return (
     <section className="relative min-h-screen overflow-hidden">

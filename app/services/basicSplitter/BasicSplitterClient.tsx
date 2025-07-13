@@ -65,7 +65,7 @@ export default function BasicSplitterClient() {
       formData.append("audio_file", uploadedFile);
       formData.append("task", "Basic Split");
 
-      const response = await fetch("http://localhost:8000/process-audio/", {
+      const response = await fetch("https://monaarch-api-1-app-5m2s2.ondigitalocean.app/process-audio/", {
         method: "POST",
         body: formData,
       });

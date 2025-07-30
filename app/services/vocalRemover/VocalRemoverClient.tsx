@@ -53,27 +53,36 @@ export default function VocalRemoverClient() {
 
   // Polling function to check if processing finished
   useEffect(() => {
-    if (!removingVocals || !uploadedFile) return;
+  if (!removingVocals || !uploadedFile) return;
 
-    let interval: NodeJS.Timer;
+  let interval: ReturnType<typeof setInterval>;
 
-    const startPolling = async () => {
-      // Construct expected output folder + files
-      const baseName = uploadedFile.name.replace(/\.[^/.]+$/, ""); // filename without extension
-      const vocalRelPath = `vocal_remover/${baseName}/vocals.wav`;
-      const instrumentalRelPath = `vocal_remover/${baseName}/accompaniment.wav`;
+  const startPolling = async () => {
+    const baseName = uploadedFile.name.replace(/\.[^/.]+$/, "");
+    const vocalRelPath = `vocal_remover/${baseName}/vocals.wav`;
+    const instrumentalRelPath = `vocal_remover/${baseName}/accompaniment.wav`;
 
-      interval = setInterval(async () => {
-        const ready = await checkOutputsReady(vocalRelPath, instrumentalRelPath);
-        if (ready) {
-          setVocalAudioURL(ready.vocalUrl);
-          setInstrumentalAudioURL(ready.instrumentalUrl);
-          setRemovingVocals(false);
-          setPolling(false);
-          clearInterval(interval);
-        }
-      }, 5000);
-    };
+    interval = setInterval(async () => {
+      const ready = await checkOutputsReady(vocalRelPath, instrumentalRelPath);
+      if (ready) {
+        setVocalAudioURL(ready.vocalUrl);
+        setInstrumentalAudioURL(ready.instrumentalUrl);
+        setRemovingVocals(false);
+        setPolling(false);
+        clearInterval(interval);
+      }
+    }, 5000);
+  };
+
+  setPolling(true);
+  startPolling();
+
+  return () => {
+    clearInterval(interval);
+    setPolling(false);
+  };
+}, [removingVocals, uploadedFile]);
+
 
     setPolling(true);
     startPolling();

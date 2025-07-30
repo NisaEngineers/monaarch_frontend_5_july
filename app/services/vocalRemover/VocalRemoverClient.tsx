@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 
-const API_BASE = "https://your-backend-url-here"; // CHANGE THIS to your deployed API URL
+const API_BASE = "https://urchin-app-m3gtz.ondigitalocean.app/"; // CHANGE THIS to your deployed API URL
 
 export default function VocalRemoverClient() {
   const [uploaded, setUploaded] = useState(false);

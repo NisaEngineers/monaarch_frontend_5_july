@@ -57,7 +57,7 @@ export default function MixingMasterClient() {
       formData.append("freq_high", highCutoff.toString());
       formData.append("reduction_db", decibelLevel.toString());
 
-      const response = await fetch("http://127.0.0.1:8002/process_audio", {
+      const response = await fetch("https://seal-app-2-dorls.ondigitalocean.app/process_audio", {
         method: "POST",
         body: formData,
       });

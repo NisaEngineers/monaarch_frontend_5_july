@@ -43,7 +43,7 @@ export default function ChordsClient() {
       const formData = new FormData();
       formData.append("file", selectedFile.current);
 
-      const response = await fetch("https://chords-app-8bj86.ondigitalocean.app/analyze/", 
+      const response = await fetch("https://chords-app-8bj86.ondigitalocean.app/analyze/", {//https://f4e1-35-230-186-108.ngrok-free.app
         method: "POST",
         headers: {
           "Accept": "audio/wav",  // Important for proper response handling
